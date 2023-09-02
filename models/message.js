@@ -13,9 +13,8 @@ const Message = sequelize.define('Message', {
     type: DataTypes.STRING,
   },
 
-  createdAt: {
-    type: DataTypes.DATE,
-  }
+  content: DataTypes.STRING
+
 })
 
 module.exports = Message

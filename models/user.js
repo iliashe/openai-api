@@ -15,7 +15,8 @@ const User = sequelize.define('User', {
   },
 
   lastActive: {
-    type: DataTypes.DATE
+    type: DataTypes.DATE,
+    DefaultValue: new Date()
   },
 })
 

@@ -13,10 +13,6 @@ const Conversation = sequelize.define('Conversation', {
     type: DataTypes.STRING,
     defaultValue: 'New Chat'
   },
-
-  createdAt: {
-    type: DataTypes.DATE,
-  }
 })
 
 module.exports = Conversation

@@ -69,7 +69,9 @@ app.use('/', (req, res, next) => {
     .findByPk(1)
     .then(user => {
       req.user = user
-      console.log(req.user.username)
+      const message = req.body.message
+      req.user.createMessage({ content: message })
+      console.log(message)
       res.send(req.user.username)
       next()
     })
@@ -77,7 +79,7 @@ app.use('/', (req, res, next) => {
 })
 
 sequelize
-  .sync({ force:true })
+  .sync()
   .then(() => {
     return User.findByPk(1)
   })
