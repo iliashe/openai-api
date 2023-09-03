@@ -42,6 +42,25 @@ Conversation.belongsTo(User)
 User.hasMany(Message)
 Message.belongsTo(User)
 
+// routes
+
+const chatRoutes = require('./routes/chat')
+const userRoutes = require('./routes/user')
+const conversationRoutes = require('./routes/conversation')
+
+app.use('/', (req, res, next) => {
+  User
+    .findByPk(1)
+    .then(user => {
+      req.user = user
+      next()
+    })
+    .catch(err => console.log(err))
+})
+  
+app.use(chatRoutes)
+app.use(userRoutes)
+app.use(conversationRoutes)
 
 // try {
 //   sequelize.authenticate().then(() => console.log('success'))
@@ -62,21 +81,6 @@ Message.belongsTo(User)
   
 //   console.log(completion.choices);
 // }
-
-
-app.use('/', (req, res, next) => {
-  User
-    .findByPk(1)
-    .then(user => {
-      req.user = user
-      const message = req.body.message
-      req.user.createMessage({ content: message })
-      console.log(message)
-      res.send(req.user.username)
-      next()
-    })
-    .catch(err => console.log(err))
-})
 
 sequelize
   .sync()
