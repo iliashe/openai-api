@@ -49,18 +49,13 @@ const userRoutes = require('./routes/user')
 const conversationRoutes = require('./routes/conversation')
 
 app.use('/', (req, res, next) => {
-  User
-    .findByPk(1)
-    .then(user => {
-      req.user = user
-      next()
-    })
-    .catch(err => console.log(err))
+  console.log('hello')
+  next()
 })
-  
-app.use(chatRoutes)
-app.use(userRoutes)
-app.use(conversationRoutes)
+
+// app.use(chatRoutes)
+app.use('/user', userRoutes)
+app.use('/conversation', conversationRoutes)
 
 // try {
 //   sequelize.authenticate().then(() => console.log('success'))
@@ -85,17 +80,6 @@ app.use(conversationRoutes)
 sequelize
   .sync()
   .then(() => {
-    return User.findByPk(1)
-  })
-  .then((user) => {
-    if (!user) {
-      return User.create({ username: 'Ilia' })
-    }
-
-    return user
-  })
-  .then(user => {
-    console.log(user)
     const port = '5000'
     app.listen(port, () => console.log(`The server is running at http://localhost:${port}`))
   })
