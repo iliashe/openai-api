@@ -28,9 +28,9 @@ exports.postLogin = (req, res, next) => {
     })
     .then(user => {
       if (user) {
-        res.send(`${user.id}`)
-      } else {
-        res.send(null)
+        Conversation
+          .findAll({ where: { UserId: user.id } })
+          .then(conversations => res.send(conversations))
       }
     })
     .catch(err => console.log(err))
