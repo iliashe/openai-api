@@ -5,6 +5,6 @@ const router = express.Router()
 
 router.get('/conversations', userController.getConversations)
 
-router.post('/login', userController.postLogin)
+// router.post('/login', userController.postLogin)
 
 module.exports = router

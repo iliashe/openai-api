@@ -44,16 +44,20 @@ Message.belongsTo(User)
 
 // routes
 
-const chatRoutes = require('./routes/chat')
 const userRoutes = require('./routes/user')
 const conversationRoutes = require('./routes/conversation')
 
+// app.use(chatRoutes)
 app.use('/', (req, res, next) => {
-  console.log('hello')
-  next()
+  User
+    .findByPk(1)
+    .then(user => {
+      req.user = user
+      next()
+    })
+    .catch(err => console.log(err))
 })
 
-// app.use(chatRoutes)
 app.use('/user', userRoutes)
 app.use('/conversation', conversationRoutes)
 
@@ -78,8 +82,18 @@ app.use('/conversation', conversationRoutes)
 // }
 
 sequelize
+  //.sync({ force:true })
   .sync()
   .then(() => {
+    return User.findByPk(1)
+  })
+  .then((user) => {
+    if (!user) {
+      return User.create({ username: 'Ilia' })
+    }
+    return user
+  })
+  .then(user => {
     const port = '5000'
     app.listen(port, () => console.log(`The server is running at http://localhost:${port}`))
   })

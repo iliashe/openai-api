@@ -10,8 +10,11 @@ exports.postSendMessage = (req, res, next) => {
   // create new conversation, if conversation id was not provided
   if (!conversationId) {
     
-    req.user
-      .createConversation()
+    User
+      .findByPk(1)
+      .then(user => {
+        return user.createConversation()
+      })
       .then(conversation => {
         conversationId = conversation.id
         return conversation.createMessage({ content: message })
