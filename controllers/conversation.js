@@ -10,29 +10,31 @@ exports.postSendMessage = (req, res, next) => {
   // create new conversation, if conversation id was not provided
   if (!conversationId) {
     
-    User
-      .findByPk(1)
-      .then(user => {
-        return user.createConversation()
-      })
+    req.user
+      .createConversation()
       .then(conversation => {
         conversationId = conversation.id
         return conversation.createMessage({ content: message })
       })
       .then(message => {
-        res.send(message)
+        return Conversation.findByPk(conversationId, { include: ['messages'] })
       })
+      .then(conversation => res.send(conversation))
       .catch(err => console.log(err))
     
   } else {
     
-    Conversation
-      .findByPk(conversationId)
-      .then(conversation => {
+    req.user
+      .getConversations({ where: { id: conversationId } })
+      .then(conversations => {
+        const conversation = conversations[0]
         return conversation.createMessage({ content: message })
       })
       .then(message => {
-        res.send(message)
+        return Conversation.findByPk(conversationId, { include: ['messages'] })
+      })
+      .then(conversation => {
+        res.send(conversation)
       })
       .catch(err => console.log(err))
 
