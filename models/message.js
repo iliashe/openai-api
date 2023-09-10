@@ -13,7 +13,15 @@ const Message = sequelize.define('message', {
     type: DataTypes.STRING,
   },
 
-  content: DataTypes.STRING
+  content: DataTypes.STRING,
+
+  role: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      isIn: [ [ "user", "assistant", "system" ] ]
+    }
+  }
 
 })
 

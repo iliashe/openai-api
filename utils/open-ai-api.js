@@ -11,9 +11,9 @@ try {
 const OpenAI = require('openai')
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
-exports.sendMessageToBot = async function sendMessageToBot(content) {
+exports.sendMessageToAssistant = async function sendMessageToAssistant(messages) {
   const completion = await openai.chat.completions.create({
-    messages: [{ role: 'user', content: content }],
+    messages: messages,
     model: 'gpt-3.5-turbo',
   })
   return completion

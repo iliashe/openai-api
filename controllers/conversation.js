@@ -3,35 +3,55 @@ const User = require('../models/user')
 
 const openAIAPI = require('../utils/open-ai-api')
 
+function getConversation(conversation) {
+  return (conversation) => {}
+}
+
+async function conversationSaveMessage(conversation, message) {
+  await conversation.createMessage({
+    content: message.content,
+    role: message.role
+  })
+
+  const updatedConversation = await conversation.reload({ include: ["messages"] })
+  console.log(updatedConversation)
+  return updatedConversation
+}
+
+async function conversationSendToAssistant(conversation) {
+  const _messages = await conversation.getMessages()
+
+  // adjusting the messages object to match the openAI api request schema
+  const messages = _messages.map(message => { 
+    return {
+      role: message.role,
+      content: message.content
+    } 
+  })
+
+  const completion = await openAIAPI.sendMessageToAssistant(messages)
+  return [conversation, completion]
+}
+
+
 exports.postSendMessage = (req, res, next) => {
-  const message = req.body.message
+  const message = {
+    content: req.body.message,
+    role: "user"
+  }
   //const userId = req.body.user.id
 
   let conversationId = req.body.conversationId
-  let conversation
+//   let conversation
 
   // create new conversation, if conversation id was not provided
   if (!conversationId) {
     
     req.user
       .createConversation()
-      .then(_conversation => {
-        conversation = _conversation
-        
-        conversationId = conversation.id
-        return conversation.createMessage({ content: message })
-      })
-      .then(message => {
-        return openAIAPI.sendMessageToBot(message.content)
-      })
-      .then(completion => {
-        console.log(completion.choices)
-        const botMessageContent = completion.choices[0].message.content
-        return conversation.createMessage({ content: botMessageContent })
-      })
-      .then(message => {
-        return Conversation.findByPk(conversationId, { include: ['messages'] })
-      })
+      .then(conversation => conversationSaveMessage(conversation, message))
+      .then(conversation => conversationSendToAssistant(conversation))
+      .then(([conversation, completion]) => conversationSaveMessage(conversation, completion.choices[0].message))
       .then(conversation => res.send(conversation))
       .catch(err => console.log(err))
     
@@ -39,24 +59,11 @@ exports.postSendMessage = (req, res, next) => {
     
     req.user
       .getConversations({ where: { id: conversationId } })
-      .then(conversations => {
-        conversation = conversations[0]
-        return conversation.createMessage({ content: message })
-      })
-      .then(message => {
-        return openAIAPI.sendMessageToBot(message.content)
-      })
-      .then(completion => {
-        console.log(completion.choices)
-        const botMessageContent = completion.choices[0].message.content
-        return conversation.createMessage({ content: botMessageContent })
-      })
-      .then(message => {
-        return Conversation.findByPk(conversationId, { include: ['messages'] })
-      })
-      .then(conversation => {
-        res.send(conversation)
-      })
+      .then(conversations => conversations[0])
+      .then(conversation => conversationSaveMessage(conversation, message))
+      .then(conversation => conversationSendToAssistant(conversation))
+      .then(([conversation, completion]) => conversationSaveMessage(conversation, completion.choices[0].message))
+      .then(conversation => res.send(conversation))
       .catch(err => console.log(err))
 
   }
