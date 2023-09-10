@@ -42,10 +42,10 @@ exports.postSendMessage = (req, res, next) => {
   //const userId = req.body.user.id
 
   let conversationId = req.body.conversationId
-//   let conversation
+
+  let getConversation
 
   // create new conversation, if conversation id was not provided
-  let getConversation
   if (!conversationId) {
     
     getConversation = req.user
