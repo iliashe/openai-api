@@ -45,26 +45,26 @@ exports.postSendMessage = (req, res, next) => {
 //   let conversation
 
   // create new conversation, if conversation id was not provided
+  let getConversation
   if (!conversationId) {
     
-    req.user
+    getConversation = req.user
       .createConversation()
-      .then(conversation => conversationSaveMessage(conversation, message))
-      .then(conversation => conversationSendToAssistant(conversation))
-      .then(([conversation, completion]) => conversationSaveMessage(conversation, completion.choices[0].message))
-      .then(conversation => res.send(conversation))
-      .catch(err => console.log(err))
+
     
   } else {
     
-    req.user
+    getConversation = req.user
       .getConversations({ where: { id: conversationId } })
       .then(conversations => conversations[0])
-      .then(conversation => conversationSaveMessage(conversation, message))
-      .then(conversation => conversationSendToAssistant(conversation))
-      .then(([conversation, completion]) => conversationSaveMessage(conversation, completion.choices[0].message))
-      .then(conversation => res.send(conversation))
-      .catch(err => console.log(err))
 
   }
+
+  getConversation
+    .then(conversation => conversationSaveMessage(conversation, message))
+    .then(conversation => conversationSendToAssistant(conversation))
+    .then(([conversation, completion]) => conversationSaveMessage(conversation, completion.choices[0].message))
+    .then(conversation => res.send(conversation))
+    .catch(err => console.log(err))
+    
 }

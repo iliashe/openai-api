@@ -13,7 +13,7 @@ const Message = sequelize.define('message', {
     type: DataTypes.STRING,
   },
 
-  content: DataTypes.STRING,
+  content: DataTypes.TEXT,
 
   role: {
     type: DataTypes.STRING,

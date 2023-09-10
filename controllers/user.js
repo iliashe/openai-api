@@ -3,7 +3,12 @@ const User = require('../models/user')
 
 exports.getConversations = (req, res, next) => {
   req.user
-    .getConversations({ include: ['messages'] })
+    .getConversations({
+      include: [ "messages" ],
+      order: [ 
+        [ "messages", "createdAt", "ASC" ]
+      ],
+    })
     .then(conversations => res.send(conversations))
     .catch(err => console.log(err))
 
